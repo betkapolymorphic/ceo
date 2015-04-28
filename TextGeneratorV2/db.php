@@ -41,6 +41,13 @@ function updateWordInDB($word,$properties){
         $q = "insert into word_propertie_relat value(null,$id_word,
       (select idword_propertie from word_propertie where word_propertie.key like 'naturable' and val  like '$properties->naturable'))";
         mysql_query($q);
+
+        $q = "insert into word_propertie_relat value(null,$id_word,
+      (select idword_propertie from word_propertie where word_propertie.key like 'p_speech' and val  like '$properties->partofspeech'))";
+        mysql_query($q);
+
+
+
     }
     return $id_word;
 }
@@ -53,23 +60,37 @@ function updateSentance($word_ids){
 }
 function getInfoAboutSentence($id)
 {
-    $q = "select id_words where idsentance=$id";
+    $q = "select id_words from sentance where idsentance=$id";
     $res = mysql_query($q);
+
     if($res){
         $ar = array();
+
         if($line = mysql_fetch_array($res, MYSQL_ASSOC)){
             $id_s = split(",",$line["id_words"]);
 
             foreach($id_s as $id){
-                $q = "select word_propertie.key as k,val from word_propertie_relat
+                $q = "select * from
+                    (
+                    select word.text as t,id_propertie,idword from word
+                    left join word_propertie_relat
+                    on  word_propertie_relat.id_word = word.idword
+                     where idword=$id
+                    )q
                     left join word_propertie
-                    on  word_propertie.idword_propertie = id_propertie
-                     where id_word=$id";
+                    on q.id_propertie = idword_propertie";
                 $res = mysql_query($q);
                 $ar[$id.""]=array();
+                $ar[$id.""]["info"]=array();
+                $flag = false;
                 if($res){
+
                      while($line = mysql_fetch_array($res, MYSQL_ASSOC)){
-                         array_push($ar[$id.""],$line['k']." => ".$line['val']);
+                         if(!$flag){
+                             $flag = true;
+                             $ar[$id.""]["word"]=$line['t'];
+                         }
+                         array_push($ar[$id.""]["info"],$line['key']."=".$line['val']);
                      }
                 }
             }
@@ -86,7 +107,30 @@ function getInfoAboutSentence($id)
         return array();
     }
 }
+function getAllSentence()
+{
+    $q = "SELECT * FROM sentance";
+    $res = mysql_query($q);
+    $arr  = array();
+    while ($line = mysql_fetch_array($res, MYSQL_ASSOC)) {
+       // array_push($arr,trim($line['id_words'],','));
 
+
+        echo "<a href='info.php?id=".$line['idsentance']."' target='_blank'>";
+        $q = "SELECT * FROM ceoapp.word where idword IN (".trim($line['id_words'],',').")";
+        $res1 = mysql_query($q);
+        while ($line1 = mysql_fetch_array($res1, MYSQL_ASSOC)) {
+            echo $line1['text']." ";
+        }
+        echo "</a><br>";
+
+    }
+    /*foreach($arr as $a){
+
+    }*/
+
+
+}
 
 
 ?>

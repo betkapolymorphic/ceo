@@ -34,33 +34,55 @@ $opts = array(
 // могут возбуждать исключения типа phpMorphy_Exception (конструктор тоже)
 try {
 
+    $myfile = fopen("1.csv", "r") or die("Unable to open file!");
+// Output one line until end-of-file
+    $flag = false;
+    $i = 0;
+    while(!feof($myfile) && $i++<20) {
+
+        $str = fgets($myfile);
+
+       $s = (split('"',$str));
+
+
 
     $morphy = new phpMorphy($dir, $lang, $opts);
 
 
 
 
-    $str = "натянул грязную шлюшку на улице берлина";
-    $s = split(" ",$str);
+
     $ids = "";
     $ar = array();
+    $flag = true;
+    $s = split(' ',$s[3]);
+
     foreach($s as $word){
 
         $y = parse($morphy,mb_strtoupper($word, "utf-8"));
 
-        if($y==null)
-            return;
+        if($y==null){
+            echo ("bad word".$word);
+            $flag = false;
+        }
+
 
        array_push($ar,$y);
 
+
+    }
+    if($flag){
+        continue;
     }
 
     for($i = 0;$i<count($ar);$i++){
        $ids.=updateWordInDB($s[$i],$ar[$i]).",";
     }
+
     updateSentance($ids);
 
-
+    }
+    fclose($myfile);
 
 } catch(phpMorphy_Exception $e) {
     die('Error occured while creating phpMorphy instance: ' . $e->getMessage());

@@ -11,10 +11,13 @@ function parse($morphy,$word){
     $info = "";
     $ar = $morphy->getAllFormsWithGramInfo($word);
 
-
     if($ar === false){
         return null;
     }
+    if(false === ($paradigms = $morphy->findWord($word))) {
+        return null;
+    }
+
 
     for($i=0;$i<count($ar) && $info=="";$i++){
         $cur_form = $ar[$i]["forms"];
@@ -22,7 +25,11 @@ function parse($morphy,$word){
             $form  =$cur_form[$j];
             if($form==$word){
                 $info = split(',',$ar[$i]["all"][$j]);
-
+              //  $c->part =
+                $part_of_speech = split(' ',$ar[$i]["all"][$j]);
+                if(count($part_of_speech)>0){
+                    $c->partofspeech = $part_of_speech[0];
+                }
                 break;
             }
         }
@@ -38,6 +45,7 @@ function parse($morphy,$word){
     $c->case = parseMorphyInfo($c,$case,$info);
     $c->type = parseMorphyInfo($c,$type,$info);
     $c->naturable = parseMorphyInfo($c,$naturable,$info);
+
     return $c;
 }
 ?>
