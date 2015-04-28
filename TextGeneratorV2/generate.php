@@ -5,11 +5,13 @@
  * Date: 24-Apr-15
  * Time: 07:01 PM
  */
-
+set_time_limit (0);
+error_reporting(0);
 // Подключите файл common.php. phpmorphy-0.3.2 - для версии 0.3.2,
 // если используется иная версия исправьте код.
 require_once( './phpmorphy-0.3.7/src/common.php');
 $dir = 'Z:\home\color.com\www\TextGeneratorV2\phpmorphy-0.3.7\dicts';
+
 $lang = 'ru_RU';
 include_once('parseWord.php');
 include_once('db.php');
@@ -38,7 +40,7 @@ try {
 // Output one line until end-of-file
     $flag = false;
     $i = 0;
-    while(!feof($myfile) && $i++<20) {
+    while(!feof($myfile) && $i++<2000) {
 
         $str = fgets($myfile);
 
@@ -61,19 +63,14 @@ try {
 
         $y = parse($morphy,mb_strtoupper($word, "utf-8"));
 
-        if($y==null){
-            echo ("bad word".$word);
-            $flag = false;
-        }
+
 
 
        array_push($ar,$y);
 
 
     }
-    if($flag){
-        continue;
-    }
+
 
     for($i = 0;$i<count($ar);$i++){
        $ids.=updateWordInDB($s[$i],$ar[$i]).",";
