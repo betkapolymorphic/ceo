@@ -11,8 +11,8 @@
 require_once( './phpmorphy-0.3.7/src/common.php');
 $dir = 'Z:\home\color.com\www\TextGeneratorV2\phpmorphy-0.3.7\dicts';
 $lang = 'ru_RU';
-
-
+include_once('parseWord.php');
+include_once('db.php');
 function parseMorphyInfo($out,$array,$info){
     foreach($array as $k){
         if(in_array($k,$info)){
@@ -33,48 +33,34 @@ $opts = array(
 // обратите внимание: все функции phpMorphy являются throwable т.е.
 // могут возбуждать исключения типа phpMorphy_Exception (конструктор тоже)
 try {
-    $c = new stdClass();
+
 
     $morphy = new phpMorphy($dir, $lang, $opts);
-    $word = 'КОФЕ';
-    /*$info->partOfSpeech = $morphy->getPartOfSpeech($word);
 
-    var_dump($info->partOfSpeech);
 
-    if(false === ($paradigms = $morphy->findWord($word))) {
-        die('Can`t find word');
-    }
-    foreach($paradigms as $paradigm) {
-        echo 'Все формы: ', implode(',', $paradigm->getAllForms()), PHP_EOL;
-        $info->animativation = $paradigm->hasGrammems('ОД');
-    }*/
 
-    $info = "";
-    $ar = $morphy->getAllFormsWithGramInfo($word);
-    for($i=0;$i<count($ar) && $info=="";$i++){
-        $cur_form = $ar[$i]["forms"];
-        for($j=0;$j<count($cur_form);$j++){
-            $form  =$cur_form[$j];
-            if($form==$word){
-                $info = split(',',$ar[$i]["all"][$j]);
 
-                break;
-            }
-        }
+    $str = "натянул грязную шлюшку на улице берлина";
+    $s = split(" ",$str);
+    $ids = "";
+    $ar = array();
+    foreach($s as $word){
+
+        $y = parse($morphy,mb_strtoupper($word, "utf-8"));
+
+        if($y==null)
+            return;
+
+       array_push($ar,$y);
+
     }
 
-    $kind =array('МР','ЖР','СР','МР-ЖР');
-    $number = array('ЕД','МН');
-    $case=array('ИМ','РД','ДТ','ВН','ТВ','ПР','ЗВ','2');
-    $type  =array('СВ','НС');
-    $naturable  =array('ОД','НО');
-    $c->kind = parseMorphyInfo($c,$kind,$info);
-    $c->number = parseMorphyInfo($c,$number,$info);
-    $c->case = parseMorphyInfo($c,$case,$info);
-    $c->type = parseMorphyInfo($c,$type,$info);
-    $c->naturable = parseMorphyInfo($c,$naturable,$info);
+    for($i = 0;$i<count($ar);$i++){
+       $ids.=updateWordInDB($s[$i],$ar[$i]).",";
+    }
+    updateSentance($ids);
 
-    var_dump($c);
+
 
 } catch(phpMorphy_Exception $e) {
     die('Error occured while creating phpMorphy instance: ' . $e->getMessage());
