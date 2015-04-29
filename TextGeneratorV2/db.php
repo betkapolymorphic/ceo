@@ -204,7 +204,7 @@ function updateWord($id,$badWord,$ps,$kind,$number,$case,$naturable)
 }
 function getAnalyzeSentance()
 {
-    $q = "select * from sentance where idsentance = 1867";// NOT IN(select id_sentance from analized_sentance);";
+    $q = "select * from sentance where idsentance NOT IN(select id_sentance from analized_sentance);";
     mysql_query($q);
 
 

@@ -19,7 +19,7 @@ echo "loaded<br>";
 $p  =0;
 foreach($sentances  as $id=>$sentance){
 
-   if($p++>1){
+   if($p++>20000){
        break;
    }
    var_dump($sentance);
