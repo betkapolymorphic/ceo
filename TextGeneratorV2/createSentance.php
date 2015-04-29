@@ -93,11 +93,11 @@ LIMIT 20";
 
 
 $res = mysql_query($q);
-while($line = mysql_query($q,MYSQL_ASSOC)){
+while($line = mysql_fetch_array($res,MYSQL_ASSOC)){
     $id = $line['count_idential_morph'];
     $mask = $line['properties_str'];
     echo getSentance($mask,$id)."<br>";
-    
+
 }
 
 
