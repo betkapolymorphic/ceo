@@ -134,6 +134,7 @@ function getAllSentence()
         echo "</a><br>";
 
     }
+
     /*foreach($arr as $a){
 
     }*/
@@ -200,6 +201,25 @@ function updateWord($id,$badWord,$ps,$kind,$number,$case,$naturable)
     if($naturable!="-1")
     mysql_query($q);
 
+}
+function getAnalyzeSentance()
+{
+    $q = "select * from sentance where idsentance NOT IN(select id_sentance from analized_sentance);";
+    mysql_query($q);
+
+
+    $res = mysql_query($q);
+    $arr = array();
+
+    if($res) {
+        while ($line = mysql_fetch_array($res, MYSQL_ASSOC)) {
+
+            //$arr['id'.$name]=array();
+            $arr[$line['idsentance']]=$line;
+            //echo $line[];
+        }
+    }
+    return $arr;
 }
 
 

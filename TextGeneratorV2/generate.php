@@ -11,7 +11,7 @@ error_reporting(0);
 // если используется иная версия исправьте код.
 require_once( './phpmorphy-0.3.7/src/common.php');
 $dir = 'Z:\home\color.com\www\TextGeneratorV2\phpmorphy-0.3.7\dicts';
-
+die();
 $lang = 'ru_RU';
 include_once('parseWord.php');
 include_once('db.php');
