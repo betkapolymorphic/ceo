@@ -40,7 +40,7 @@ try {
 // Output one line until end-of-file
     $flag = false;
     $i = 0;
-    while(!feof($myfile) && $i++<2000) {
+    while(!feof($myfile)) {
 
         $str = fgets($myfile);
 
@@ -56,11 +56,14 @@ try {
 
     $ids = "";
     $ar = array();
-    $flag = true;
+    $flag = false;
     $s = split(' ',$s[3]);
 
     foreach($s as $word){
-
+        if (!preg_match('/[^A-Za-z0-9]/', $word)) // '/[^a-z\d]/i' should also work.
+        {
+            $flag = true;
+        }
         $y = parse($morphy,mb_strtoupper($word, "utf-8"));
 
 
@@ -70,6 +73,10 @@ try {
 
 
     }
+        if($flag){
+            continue;
+        }
+
 
 
     for($i = 0;$i<count($ar);$i++){
