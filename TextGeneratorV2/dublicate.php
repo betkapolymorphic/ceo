@@ -22,14 +22,21 @@ foreach($sentances  as $id=>$sentance){
    if($p++>1){
        break;
    }
+   var_dump($sentance);
     ///$c_words = preg_split('/,/',$sentance['id_words']);
-    $q = "SELECT id_propertie,group_concat(id_propertie order by id_propertie) as gi FROM ceoapp.word_propertie_relat";// where id_word in(".trim($sentance['id_words'],',').") group by id_word";
+
+    $q = "select * from
+        (
+        SELECT *,group_concat(id_propertie order by id_propertie) as gi FROM ceoapp.word_propertie_relat where id_word in(".trim($sentance['id_words'],',').")  group by id_word
+        )q
+        order by field(id_word,".trim($sentance['id_words'],',').")";
+
     $res = mysql_query($q);
     $str = "";
     while($line = mysql_fetch_array($res,MYSQL_ASSOC)){
         $str.=$line['gi'].'|';
     }
-    die($str);
+
     /*if(!isset($arr[$str])){
         $arr[$str]=0;
     }
