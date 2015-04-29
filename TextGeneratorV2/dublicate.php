@@ -22,7 +22,7 @@ foreach($sentances  as $id=>$sentance){
    if($p++>20000){
        break;
    }
-   var_dump($sentance);
+
     ///$c_words = preg_split('/,/',$sentance['id_words']);
 
     $q = "select * from
