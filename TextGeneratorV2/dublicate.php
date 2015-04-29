@@ -19,11 +19,11 @@ echo "loaded<br>";
 $p  =0;
 foreach($sentances  as $id=>$sentance){
 
-   if($p++>20){
+   if($p++>20000){
        break;
    }
     ///$c_words = preg_split('/,/',$sentance['id_words']);
-    $q = "SELECT id_propertie,group_concat(id_propertie) as gi FROM ceoapp.word_propertie_relat where id_word in(".trim($sentance['id_words'],',').") group by id_word";
+    $q = "SELECT id_propertie,group_concat(id_propertie group by id_propertie) as gi FROM ceoapp.word_propertie_relat where id_word in(".trim($sentance['id_words'],',').") group by id_word";
     $res = mysql_query($q);
     $str = "";
     while($line = mysql_fetch_array($res,MYSQL_ASSOC)){
