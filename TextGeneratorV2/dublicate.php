@@ -33,7 +33,7 @@ foreach($sentances  as $id=>$sentance){
         $arr[$str]=0;
     }
     $arr[$str]++;*/
-    $sql = "insert into masks VALUES (null,'$str',1)";
+    $sql = "insert into masks VALUES (null,'$str',$id)";
     mysql_query($sql);
 
     $sql = "insert into analized_sentance values(null,$id)";
