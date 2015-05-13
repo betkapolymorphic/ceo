@@ -59,13 +59,194 @@ function updateWordInDB($word,$properties){
     }
     return $id_word;
 }
-function updateSentance($word_ids){
+function updateSentance($word_ids,$bad){
 
-
+        if($bad) return;
         $q = "insert into sentance value(null,'$word_ids')";
-//        echo $q;
+//
     mysql_query($q);
 }
+
+function getBeforeAfter($word)
+{
+    /*$sql_a  = "(SELECT idword FROM ceoapp.word
+        where text like '$word')";
+    $a = "";
+    $res = mysql_query($sql_a);
+    if($line = mysql_fetch_array($res,MYSQL_ASSOC))
+        $a = $line['idword'];
+    */
+    $a = $word;
+
+    $word_middle = ','.$a.',';
+    $as = "%$a%";
+
+
+    $sql = "
+
+
+
+        select aftr from
+        (
+        select idsentance,aftr from
+        (
+        select *,substring( lastPart.end,1,locate(',',lastPart.end) - 1) as aftr
+
+        from
+        (
+            select *,
+                substring(id_words,locate('$word_middle',id_words)+length($a)+2) as end,
+                substring(id_words,1,locate('$word_middle',id_words)-1) as begin from
+                (
+                    select * from sentance where id_words like '$as'
+                ) dataset
+        )lastPart
+
+        )bfr_aft_data
+        )mma";
+   // echo $sql."<br>";
+
+    $bfore_dublicate = array();
+
+    $after_dublicate = array();
+
+
+
+    $res = mysql_query($sql) or die(mysql_error());
+
+
+    while($line = mysql_fetch_array($res,MYSQL_ASSOC)){
+
+        if(!isset($after_dublicate[$line['aftr']])){
+            $after_dublicate[$line['aftr']] = true;
+           // array_push($after,$line['aftr']);
+        }
+    }
+    $res = array();
+    $res['after'] = $after_dublicate;
+
+    return $res;
+}
+function getWords($mask)
+{
+    $arr = array();
+    $q = "select id_word from
+            (
+            select * from
+            (
+            SELECT *,group_concat(id_propertie order by id_propertie) as gr FROM
+                ceoapp.word_propertie_relat
+            group by(id_word)
+            having gr like '$mask'
+
+            )q1
+            left join word
+            on id_word=idword)q
+            order by rand()
+
+            ";
+    $res =  mysql_query($q) or die(mysql_error());
+$dict = array();
+
+    if($res){
+
+        while($line = mysql_fetch_array($res,MYSQL_ASSOC)){
+
+            array_push($arr,$line['id_word']);
+        }
+        array_push($dict,$arr);
+    }
+    return $arr;
+}
+
+function findWordByText($text){
+    $sql = "select idword from word where text like '$text'";
+    $res = mysql_query($sql) or die(mysql_error());
+
+
+    while($line = mysql_fetch_array($res,MYSQL_ASSOC)){
+        return $line['idword'];
+    }
+    return "0";
+}
+function getAfter($word)
+{
+    /*$sql_a  = "(SELECT idword FROM ceoapp.word
+        where text like '$word')";
+    $a = "";
+    $res = mysql_query($sql_a);
+    if($line = mysql_fetch_array($res,MYSQL_ASSOC))
+        $a = $line['idword'];
+    */
+    $a = $word;
+
+    $word_middle = ','.$a.',';
+    $asa = "%$a%";
+
+
+    $sql = "select (select text from word where idword=aftr) as aftr,
+            (select text from word where idword=bfore) as bfore from
+        (
+        select idsentance,aftr,bfore from
+        (
+        select *,substring( lastPart.end,1,locate(',',lastPart.end) - 1) as aftr,
+        substring(lastPart.begin,LENGTH(lastPart.begin) - LOCATE(',', REVERSE(lastPart.begin))+2) as bfore
+
+        from
+        (
+            select *,
+                substring(id_words,locate('$word_middle',id_words)+length($a)+2) as end,
+                substring(id_words,1,locate('$word_middle',id_words)-1) as begin from
+                (
+                    select * from sentance where id_words like concat('%,',$a,',%')
+                ) dataset
+        )lastPart
+
+        )bfr_aft_data
+        )mma";
+
+    $bfore_dublicate = array();
+
+    $after_dublicate = array();
+    $before = array();
+    $after = array();
+
+
+    $res = mysql_query($sql) or die(mysql_error());
+
+
+    while($line = mysql_fetch_array($res,MYSQL_ASSOC)){
+        if(!isset($bfore_dublicate[$line['bfore']])){
+            $bfore_dublicate[$line['bfore']] = true;
+
+        }
+        if(!isset($after_dublicate[$line['aftr']])){
+            $after_dublicate[$line['aftr']] = true;
+        }
+
+        $res['after'] = $after_dublicate;
+        $res['before']=$bfore_dublicate;
+    }
+
+    return $after_dublicate;
+}
+function getParthOfSpeech($idword)
+{
+    if($idword=="")
+        return -1;
+    $q = "select id_propertie from word_propertie_relat where id_word = $idword";
+
+    $res = mysql_query($q);
+    while($line = mysql_fetch_array($res,MYSQL_ASSOC)){
+
+        if(intval($line['id_propertie'])<=21){
+
+            return $line['id_propertie'];
+        }
+    }
+    return -1;
+}
+
 function getInfoAboutSentence($id)
 {
     $q = "select id_words from sentance where idsentance=$id";
@@ -117,7 +298,7 @@ function getInfoAboutSentence($id)
 }
 function getAllSentence()
 {
-    $q = "SELECT * FROM sentance";
+    $q = "SELECT * FROM sentance limit 1000";
     $res = mysql_query($q);
     $arr  = array();
     while ($line = mysql_fetch_array($res, MYSQL_ASSOC)) {

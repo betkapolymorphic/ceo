@@ -19,9 +19,9 @@ echo "loaded<br>";
 $p  =0;
 foreach($sentances  as $id=>$sentance){
 
-   if($p++>20000){
+  /* if($p++>20000){
        break;
-   }
+   }*/
 
     ///$c_words = preg_split('/,/',$sentance['id_words']);
 

@@ -24,13 +24,13 @@ if(!defined('PHPMORPHY_DIR')) {
     define('PHPMORPHY_DIR', dirname(__FILE__));
 }
 
-require_once(PHPMORPHY_DIR . './fsa/fsa.php');
-require_once(PHPMORPHY_DIR . './graminfo/graminfo.php');
-require_once(PHPMORPHY_DIR . './morphiers.php');
-require_once(PHPMORPHY_DIR . './gramtab.php');
-require_once(PHPMORPHY_DIR . './storage.php');
-require_once(PHPMORPHY_DIR . './source.php');
-require_once(PHPMORPHY_DIR . './langs_stuff/common.php');
+require_once(PHPMORPHY_DIR . '/fsa/fsa.php');
+require_once(PHPMORPHY_DIR . '/graminfo/graminfo.php');
+require_once(PHPMORPHY_DIR . '/morphiers.php');
+require_once(PHPMORPHY_DIR . '/gramtab.php');
+require_once(PHPMORPHY_DIR . '/storage.php');
+require_once(PHPMORPHY_DIR . '/source.php');
+require_once(PHPMORPHY_DIR . '/langs_stuff/common.php');
 
 class phpMorphy_Exception extends Exception { }
 

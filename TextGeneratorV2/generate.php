@@ -11,25 +11,22 @@ error_reporting(0);
 // если используется иная версия исправьте код.
 require_once( './phpmorphy-0.3.7/src/common.php');
 $dir = 'Z:\home\color.com\www\TextGeneratorV2\phpmorphy-0.3.7\dicts';
-die();
+
 $lang = 'ru_RU';
 include_once('parseWord.php');
 include_once('db.php');
-function parseMorphyInfo($out,$array,$info){
-    foreach($array as $k){
-        if(in_array($k,$info)){
-            return $k;
 
-        }
-    }
-    return "";
-}
 
 // Укажите опции
 // Список поддерживаемых опций см. ниже
 $opts = array(
     'storage' => PHPMORPHY_STORAGE_FILE,
+    'predict_by_suffix' => false,
+    'predict_by_db' => false
 );
+$morphy = new phpMorphy($dir, $lang, $opts);
+
+
 
 // создаем экземпляр класса phpMorphy
 // обратите внимание: все функции phpMorphy являются throwable т.е.
@@ -57,6 +54,8 @@ try {
     $ids = "";
     $ar = array();
     $flag = false;
+    $bad = false;
+
     $s = split(' ',$s[3]);
 
     foreach($s as $word){
@@ -65,6 +64,9 @@ try {
             $flag = true;
         }
         $y = parse($morphy,mb_strtoupper($word, "utf-8"));
+        if($y==null){
+            $bad = true;
+        }
 
 
 
@@ -83,7 +85,7 @@ try {
        $ids.=updateWordInDB($s[$i],$ar[$i]).",";
     }
 
-    updateSentance($ids);
+    updateSentance($ids,$bad);
 
     }
     fclose($myfile);

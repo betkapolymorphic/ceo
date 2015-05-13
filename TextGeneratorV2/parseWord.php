@@ -5,7 +5,15 @@
  * Date: 26-Apr-15
  * Time: 05:03 PM
  */
+function parseMorphyInfo($out,$array,$info){
+    foreach($array as $k){
+        if(in_array($k,$info)){
+            return $k;
 
+        }
+    }
+    return "";
+}
 function parse($morphy,$word){
     $c = new stdClass();
     $info = "";
@@ -24,9 +32,9 @@ function parse($morphy,$word){
         for($j=0;$j<count($cur_form);$j++){
             $form  =$cur_form[$j];
             if($form==$word){
-                $info = split(',',$ar[$i]["all"][$j]);
+                $info = preg_split('/,/',$ar[$i]["all"][$j]);
               //  $c->part =
-                $part_of_speech = split(' ',$ar[$i]["all"][$j]);
+                $part_of_speech = preg_split('/ /',$ar[$i]["all"][$j]);
                 if(count($part_of_speech)>0){
                     $c->partofspeech = $part_of_speech[0];
                 }
