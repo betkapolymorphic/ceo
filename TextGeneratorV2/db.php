@@ -12,6 +12,18 @@ mysql_connect($hostname, $username, $password) OR DIE("Не могу созда�
 mysql_select_db($dbName) or die(mysql_error());
 mysql_set_charset('utf8');
 
+function getIngoreWords()
+{
+    $q = "select * from ignore_words";
+    $res = mysql_query($q) or die(mysql_error());
+
+    $arr = array();
+    while($line = mysql_fetch_array($res,MYSQL_ASSOC)){
+        array_push($arr,$line['idword']);
+    }
+    return $arr;
+}
+
 function updateWordInDB($word,$properties){
 
     $q = "select idword  from word where text like '$word'";
@@ -65,6 +77,21 @@ function updateSentance($word_ids,$bad){
         $q = "insert into sentance value(null,'$word_ids')";
 //
     mysql_query($q);
+}
+function idsToText($ids)
+{
+    $s = "";
+    $arr = implode(",",$ids);
+    $sql = "SELECT * FROM ceoapp.word
+where idword in ($arr)
+order by field(idword,$arr)";
+    $res = mysql_query($sql) or die(mysql_error());
+
+
+    while($line = mysql_fetch_array($res,MYSQL_ASSOC)){
+        $s.=$line['text'].' ';
+    }
+    return $s;
 }
 
 function getBeforeAfter($word)
@@ -141,17 +168,18 @@ function getWords($mask)
 
             )q1
             left join word
-            on id_word=idword)q
+            on id_word=idword
+            where isbadword=0)q
+
             order by rand()
 
             ";
     $res =  mysql_query($q) or die(mysql_error());
-$dict = array();
+    $dict = array();
 
     if($res){
 
         while($line = mysql_fetch_array($res,MYSQL_ASSOC)){
-
             array_push($arr,$line['id_word']);
         }
         array_push($dict,$arr);
@@ -322,9 +350,26 @@ function getAllSentence()
 
 
 }
-function getBadWords()
+function getWord($text){
+   $q =  "SELECT * FROM ceoapp.word where text like '$text'";
+    $res = mysql_query($q);
+    $ar = array();
+
+    if($res) {
+
+
+        while($line = mysql_fetch_array($res, MYSQL_ASSOC)) {
+            array_push($ar,$line);
+
+        }
+    }
+    return $ar;
+}
+
+function getBadWords($page)
 {
-    $q = "SELECT * FROM ceoapp.word where isbadword=1";
+    $qa = $page*300;
+    $q = "SELECT * FROM ceoapp.word where isbadword=1 limit 300 OFFSET $qa";
     $res = mysql_query($q);
     $ar = array();
 

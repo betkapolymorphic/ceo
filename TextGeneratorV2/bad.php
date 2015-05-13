@@ -36,6 +36,10 @@
 
 
     include_once 'db.php';
+    $page = 1;
+    if(isset($_GET['page'])){
+        $page = $_GET['page'];
+    }
     function createSelectFromProp($prop){
         $arr = getPropertie($prop);
         $s = "<td><select class='".$prop."'>";
@@ -52,7 +56,13 @@
     $p3 = createSelectFromProp('number');
     $p4=createSelectFromProp('case');
     $p5=createSelectFromProp('naturable');
-    $ar  = getBadWords();
+    if(!isset($_GET['word'])) {
+        $ar = getBadWords($page);
+    }else{
+        $ar = getWord($_GET['word']);
+    }
+
+
     foreach($ar as $a){
         echo "<tr id='tr_".$a['idword']."'>";
         echo "<td class='w'>".$a['text']."</td>".$p1.$p2.$p3.$p4.$p5."<td><button onclick=\"update('".$a['idword']."')\">UPDATE</button></td>";

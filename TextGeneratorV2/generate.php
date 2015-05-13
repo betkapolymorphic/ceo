@@ -62,6 +62,7 @@ try {
         if (!preg_match('/[^A-Za-z0-9]/', $word)) // '/[^a-z\d]/i' should also work.
         {
             $flag = true;
+            break;
         }
         $y = parse($morphy,mb_strtoupper($word, "utf-8"));
         if($y==null){

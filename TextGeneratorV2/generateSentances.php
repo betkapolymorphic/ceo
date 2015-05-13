@@ -23,15 +23,16 @@ function correctSentance($s,$masks)
             if(strpos($masks[$i+1],"2,")!==false){
                 $count = 0;
                 foreach($glas as $g){
-                    if($count>=2){
-                        $cur_s.="о";
-                        break;
-                    }
+
                     if(strpos($split[$i+1],$g)!==false){
                         $count++;
                     }
                 }
+                if($count==2) {
+                    $cur_s .= "о";
+                }
             }
+
         }
         $str.=$cur_s." ";
     }
@@ -39,25 +40,35 @@ function correctSentance($s,$masks)
 
 }
 
+
+
+
+$GLOBALS['ignore'] = getIngoreWords();
 function ignoreThis($idword){
-    return $idword=="1093" || $idword=="2848" || $idword=="9021";
+    return in_array($idword."",$GLOBALS['ignore']);
 }
 $GLOBALS['nreturn'] = false;
 function brute($step,$curIndex,$prevNext,$out,$synonyms,$predlog,$masks)
 {
+
+
     if($GLOBALS['nreturn']){
         return;
     }
-    if($step+1>count($prevNext)){
+    if($step+1>=count($prevNext)){
         $GLOBALS['nreturn']  =true;
+        echo correctSentance(idsToText($out),$masks);
 
-        foreach ($synonyms as $i) {
+
+        /*foreach ($synonyms as $i) {
             $tmp=$out[$i];
             foreach($prevNext[$i] as $synonym){
                 $out[$i] = $synonym;
-                echo implode(",",$out);
+              //  echo implode(",",$out);
             }
-        }
+        }*/
+
+
         array_pop($out);
         return;
 
@@ -68,13 +79,14 @@ function brute($step,$curIndex,$prevNext,$out,$synonyms,$predlog,$masks)
     {
         $word = $prevNext[$step+1][$i];
         if(isset($predlog[($step+1).""])){
-            $word = $predlog[($step+1).""];
+            $word = findWordByText($predlog[($step+1).""]);
         }
 
         if(ignoreThis($word)){
             continue;
         }
         if(in_array($word,$beforeAfter['after'])){
+
             array_push($out,$word);
             brute($step+1,$i,$prevNext,$out,$synonyms,$predlog,$masks);
         }
@@ -84,8 +96,10 @@ function brute($step,$curIndex,$prevNext,$out,$synonyms,$predlog,$masks)
         array_pop($out);
     }
 }
-//echo correctSentance(,
- //   );
+
+
+
+
 $masks = preg_split("/\\|/","2,22,28,36|секс,трах|16|2,23,29,36|1,23,32,36|");
 $text = "классический секс с небритой киской";
 $synonyms = array();
@@ -122,6 +136,7 @@ for($i=0;$i<count($masks);$i++)
 }
 //var_dump($prevNext);
 $out = array();
+array_push($out,$prevNext[0][0]);
 brute(0,0,$prevNext,$out,$synonyms,$predlog,$masks);
 
 
